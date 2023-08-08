@@ -18,6 +18,7 @@ CLEAR = "\x1b[2K"
 
 TYPERACER = 'https://play.typeracer.com/'
 MONKEYTYPE = 'https://monkeytype.com/'
+KEYMASH = 'https://keymash.io/'
 
 probability = [0,0,0,0,0,1]
 mistake_lst = [0, 0, 0, 0, 1, 2, 3, 4]
@@ -40,7 +41,6 @@ def typeRacer():
     website = 'typeracer'
 
     print(f'{LIGHT_GREEN}Redirect to TypeRacer{RESET}')
-    driver.get(TYPERACER)
 
     interval = float(input(f'{BOLD}- Interval: {RESET}'))
     mistake = str(input(f'{BOLD}- Allow mistakes [y/n]: {RESET}')).strip()
@@ -86,7 +86,6 @@ def monkeyType():
     website = 'monkeytype'
 
     print(f'{LIGHT_GREEN}Redirect to MonkeyType{RESET}')
-    driver.get(MONKEYTYPE)
 
     start_type = str(input('Choose type: ')).strip().lower()
 
@@ -142,6 +141,44 @@ def monkeyType():
         et = time.time()
         print(f'{LIGHT_GREEN}Finished in: {str(round(et-st, 2))}{RESET}')
 
+def keyMash():
+    global website
+
+    website = 'keymash'
+
+    print(f'{LIGHT_GREEN}Redirect to KeyMash{RESET}')
+
+    interval = float(input(f'{BOLD}- Interval: {RESET}'))
+    mistake = str(input(f'{BOLD}- Allow mistakes [y/n]: {RESET}')).strip()
+    pause = str(input(f'{BOLD}- Allow pause [y/n]: {RESET}')).strip()
+
+    WebDriverWait(driver, 20).until(EC.presence_of_element_located((By.CSS_SELECTOR, '.match--text.match--mono')))
+    word_lst = list(driver.find_element(By.CSS_SELECTOR, '.match--text.match--mono').text)
+    
+    txt_input = WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.CSS_SELECTOR, '.match--input')))
+    print('Starting...')
+    time.sleep(0.1) # Ensure the visibility
+
+    st = time.time()
+    for index in range(len(word_lst)):
+        if random.choice(probability) == 1 and index > 2:
+            if (mistake=='y'):
+                m = random.choice(mistake_lst)
+                for i in range(m):
+                    txt_input.send_keys(random.choice(alphabet)) # Choose random letter to press
+                    time.sleep(random.choice(wrong_pause_lst))
+                for i in range(m):
+                    txt_input.send_keys(Keys.BACKSPACE)
+                    time.sleep(random.choice(wrong_pause_lst))
+            if (pause=='y'):
+                p = random.choice(pause_lst) # Random pause between characters
+                time.sleep(p)
+        txt_input.send_keys(word_lst[index])
+        time.sleep(interval)
+
+    et = time.time()
+    print(f'{LIGHT_GREEN}Finished in: {str(round(et-st, 2))}{RESET}')
+
 def main():
     while True:
         cmd = str(input('>> COMMAND: ')).strip().lower()
@@ -152,15 +189,23 @@ def main():
                     typeRacer()
                 elif website == 'monkeytype':
                     monkeyType()
+                elif website == 'keymash':
+                    keyMash()
             else:
                 print('No website saved')
 
         elif cmd == 'start typeracer':
+            driver.get(TYPERACER)
             typeRacer()
             
         elif cmd == 'start monkeytype':
+            driver.get(MONKEYTYPE)
             monkeyType()
         
+        elif cmd == 'start keymash':
+            driver.get(KEYMASH)
+            keyMash()
+
         elif cmd == 'load typeracer':
 
             driver.get(TYPERACER)
@@ -182,28 +227,8 @@ def main():
                 
                 except FileNotFoundError as e:
                     print(e)
+            key
 
-        elif cmd == 'load monkeytype':
-            driver.get(MONKEYTYPE)
-
-            load_cookies = str(input(f'{BOLD}- Path to JSON: {RESET}')).strip()
-
-            if (load_cookies != ''):
-                try:
-                    # ./typeracer-cheat/typeracer-cookies.json
-                    with open(load_cookies, encoding='utf-8') as f:
-                        data = json.load(f)
-                        cookies = data['cookies']
-                        for cookie in cookies:
-                            if 'sameSite' in cookie:
-                                cookie['sameSite'] = 'Strict'
-                            driver.add_cookie(cookie)
-
-                    driver.refresh()
-                
-                except FileNotFoundError as e:
-                    print(e)
-        
         elif cmd == 'quit':
             print(f'{LIGHT_GREEN}Quited the game!{RESET}')
             break
