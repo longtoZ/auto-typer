@@ -13,8 +13,6 @@ LIGHT_RED = "\033[1;31m"
 LIGHT_GREEN = "\033[1;32m"
 BOLD = "\033[1m"
 RESET = '\033[0m'
-UP = "\033[1A"
-CLEAR = "\x1b[2K"
 
 TYPERACER = 'https://play.typeracer.com/'
 MONKEYTYPE = 'https://monkeytype.com/'
@@ -45,6 +43,7 @@ def typeRacer():
     interval = float(input(f'{BOLD}- Interval: {RESET}'))
     mistake = str(input(f'{BOLD}- Allow mistakes [y/n]: {RESET}')).strip()
     pause = str(input(f'{BOLD}- Allow pause [y/n]: {RESET}')).strip()
+    ready = input('Are you ready? Press ENTER to start!')
 
     lst = list(WebDriverWait(driver, 20).until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, 'span[unselectable="on"]'))))
     
@@ -94,6 +93,7 @@ def monkeyType():
         interval = float(input(f'{BOLD}- Interval: {RESET}'))
         mistake = str(input(f'{BOLD}- Allow mistakes [y/n]: {RESET}')).strip()
         pause = str(input(f'{BOLD}- Allow pause [y/n]: {RESET}')).strip()
+        ready = input('Are you ready? Press ENTER to start!')
 
         driver.find_element(By.CSS_SELECTOR, '#words').click()
         txt_input = WebDriverWait(driver, 20).until(EC.presence_of_element_located((By.CSS_SELECTOR, '#wordsInput')))
@@ -151,6 +151,7 @@ def keyMash():
     interval = float(input(f'{BOLD}- Interval: {RESET}'))
     mistake = str(input(f'{BOLD}- Allow mistakes [y/n]: {RESET}')).strip()
     pause = str(input(f'{BOLD}- Allow pause [y/n]: {RESET}')).strip()
+    ready = input('Are you ready? Press ENTER to start!')
 
     WebDriverWait(driver, 20).until(EC.presence_of_element_located((By.CSS_SELECTOR, '.match--text.match--mono')))
     word_lst = list(driver.find_element(By.CSS_SELECTOR, '.match--text.match--mono').text)
